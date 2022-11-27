@@ -1,0 +1,43 @@
+EJECUTAR MAPREDUCER (LOCAL)
+    cat api_wikipedia/*.txt |python docker-hadoop-test/mapper.py |python docker-hadoop-test/reducer.py
+
+BUILDEAR DOCKERFILE 
+    docker build -t hadoop .  
+
+LEVANTAR CONTENEDOR
+    docker run --name hadoop -p 9864:9864 -p 9870:9870 -p 8088:8088 -p 9000:9000 --hostname sd hadoop
+
+INGRESAR A CONTENEDOR 
+    docker exec -it hadoop bash   
+
+CREAR CARPETAS EN HADOOP
+    hdfs dfs -mkdir /user
+    hdfs dfs -mkdir /user/hduser
+    hdfs dfs -mkdir /user/hduser/input
+
+COPIAR CARPETAS DE TEXTOS EN HADOOP
+    hdfs dfs -put Wikipedia/Wikipedia/Documentos1 /user/hduser/input
+    hdfs dfs -put Wikipedia/Wikipedia/Documentos2 /user/hduser/input
+
+DAR TODOS LOS PERMISOS A LA CARPETA hduser
+    sudo chown -R hduser .
+
+ mapred streaming -files mapper.py,prueba.py -input /user/hduser/input/Documentos*/*.txt -output /user/hduser/output -mapper "python mapper.py" -reducer "python prueba.py"
+
+
+ ver outpout
+    hdfs dfs -cat /user/hduser/output/*
+
+Crear Base de datos
+    ls -> compruebo archivos en la posicion
+    cat resultados.txt | python toJson.py
+
+Muestro Base de datos
+    cat bdd.json
+
+Compilo buscador
+    python buscador2.py
+
+
+Correr creador de base de datos
+    cat /resultados.txt | python toJson.py
